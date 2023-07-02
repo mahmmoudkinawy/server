@@ -10,12 +10,16 @@ COPY ["YaqeenApi.csproj", "./"]
 RUN dotnet restore "YaqeenApi.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "YaqeenApi.csproj" -c Release -o /app/build
+RUN dotnet build "YaqeenApi.csproj" -c Debug -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "YaqeenApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "YaqeenApi.csproj" -c Debug -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV LOG_LEVEL=Debug
+
 ENTRYPOINT ["dotnet", "YaqeenApi.dll"]
